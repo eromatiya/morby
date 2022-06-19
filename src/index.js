@@ -1,6 +1,14 @@
-require('dotenv').config();
+const express = require('express')
+const app = express();
+const port = 3000
 
-const { Client, Intents, Permissions } = require('discord.js');
+app.get('/', (req, res) => res.send('All right!'))
+
+app.listen(port, () =>
+	console.log(`Your app is listening a http://localhost:${port}`)
+);
+
+const { Client, Intents } = require('discord.js');
 
 const client = new Client({intents: [
 	Intents.FLAGS.GUILDS,
@@ -8,6 +16,12 @@ const client = new Client({intents: [
     Intents.FLAGS.GUILD_PRESENCES,
     Intents.FLAGS.GUILD_MEMBERS]
 });
+
+const morsData = {
+	genChatID: "848475975469236227",
+	rolesID: "848510393298452480",
+	introID: "849678362158956604"
+};
 
 // Logged in
 client.on('ready', () =>{
@@ -17,7 +31,7 @@ client.on('ready', () =>{
 	let state = 0;
 	const presences = [
 		{ type: 'PLAYING', message: 'ToramOnline' },
-		{ type: 'WATCHING', message: 'NTR Hentai' },
+		{ type: 'WATCHING', message: 'Toram | How to become rich fast using mods' },
 		{ type: 'STREAMING', message: 'Half-Life 3'}
 	];
 
@@ -31,10 +45,7 @@ client.on('ready', () =>{
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
 	
-	// Channel ID of Genchat Channel
-	const chanGenChatID = "848475975469236227"
-	const chanRoleID = "848510393298452480"
-	const channel = client.channels.cache.get(chanGenChatID);
+	const channel = client.channels.cache.get(morsData.genChatID);
 	
 	if(oldMember.roles.cache.size < newMember.roles.cache.size) {
 		const fetchedLogs = await oldMember.guild.fetchAuditLogs({
@@ -57,14 +68,13 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 		}
 		
 		if (isNewComer() && isMorsCerta()) {
-			let chanIntroID = "849678362158956604"
-			let newComer = newMember.user.id
-			let newTitle = `***Welcome to Mors Certa!***`
-			let newMsg = `*Hey hey, <@${newComer}>!*` +
-				` *Don't be shy, come say hi! Tell us a little bit about yourself in <#${chanIntroID}>!*` +
-				` *Don't forget to grab your <#${chanRoleID}> too, btw! *` +
-				` *Enjoy your stay here! ( ꈍᴗꈍ)*`
-			let morbyImg = "https://raw.githubusercontent.com/manilarome/morby/main/img/morby.png"
+			const newComer = newMember.user.id
+			const newTitle = `***Welcome to Mors Certa!***`
+			let newMsg = `*Hey hey, <@${newComer}>!*`
+				+ ` *Don't be shy, come say hi! Tell us a little bit about yourself in <#${morsData.introID}>!*`
+				+ ` *Don't forget to grab your <#${morsData.rolesID}> too, btw! *`
+				+ ` *Enjoy your stay here! ( ꈍᴗꈍ)*`
+			const morbyImg = "https://raw.githubusercontent.com/manilarome/morby/main/img/morby.png"
 			
 			// Send welcome msg to gen channel channel
 			channel.send({ embeds: [{
@@ -95,6 +105,5 @@ client.on('messageCreate', async message => {
 		}
 	}
 })
-
 
 client.login(process.env.TOKEN);
